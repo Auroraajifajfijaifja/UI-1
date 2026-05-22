@@ -44,3 +44,4 @@ nginx.conf
 # Misc
 *.md
 !README.md
+node_modules
