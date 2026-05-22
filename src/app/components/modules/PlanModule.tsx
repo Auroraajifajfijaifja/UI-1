@@ -1,3 +1,4 @@
+import React from "react";
 import { Area, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const trend = [

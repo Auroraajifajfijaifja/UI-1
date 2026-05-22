@@ -1,3 +1,4 @@
+import React from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const STAT_PALETTE = [

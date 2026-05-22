@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import * as echarts from "echarts";
 import {
@@ -322,7 +322,8 @@ function ChinaMap() {
       },
       geo: {
         map: "china",
-        roam: false,
+        roam: true,
+        scaleLimit: { min: 0.8, max: 4 },
         zoom: 1.15,
         center: [105, 36],
         itemStyle: {
@@ -563,6 +564,24 @@ function RiskCenter() {
 }
 
 function AISuggestion() {
+  const [states, setStates] = useState<Record<string, "idle" | "executing" | "done">>({});
+
+  const exec = (key: string, label: string) => {
+    setStates((s) => ({ ...s, [key]: "executing" }));
+    setTimeout(() => {
+      setStates((s) => ({ ...s, [key]: "done" }));
+    }, 1800);
+  };
+
+  const execAll = () => {
+    exec("plan", "计划提报建议");
+    setTimeout(() => exec("purchase", "采购触发建议"), 400);
+  };
+
+  const planState = states["plan"] ?? "idle";
+  const purchaseState = states["purchase"] ?? "idle";
+  const allDone = planState === "done" && purchaseState === "done";
+
   return (
     <Panel title="AI 智能提报建议" extra={<Sparkles className="w-3.5 h-3.5" style={{ color: COLORS.orange }} />}>
       <div className="space-y-2">
@@ -574,6 +593,29 @@ function AISuggestion() {
           <div style={{ color: COLORS.text, fontSize: 11, lineHeight: 1.6 }}>
             <span style={{ color: COLORS.orange }}>济南西站项目部</span>已完成项目提报入场，系统建议依据往期同类项目性质，自动生成采购计划提报方案，待人工确认。
           </div>
+          <div className="mt-2 flex justify-end">
+            <button
+              onClick={() => exec("plan", "计划提报建议")}
+              disabled={planState !== "idle"}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-medium transition-all"
+              style={{
+                background: planState === "done"
+                  ? "rgba(39,214,165,0.18)"
+                  : planState === "executing"
+                  ? "rgba(63,169,245,0.18)"
+                  : "rgba(63,169,245,0.14)",
+                border: `1px solid ${planState === "done" ? COLORS.green : planState === "executing" ? COLORS.cyan : "rgba(63,169,245,0.45)"}`,
+                color: planState === "done" ? COLORS.green : planState === "executing" ? COLORS.cyan : COLORS.cyanSoft,
+                cursor: planState !== "idle" ? "default" : "pointer",
+                boxShadow: planState !== "idle" ? `0 0 10px ${planState === "done" ? COLORS.green : COLORS.cyan}40` : "none",
+              }}
+            >
+              {planState === "idle" && <Sparkles className="w-3 h-3" />}
+              {planState === "executing" && <span className="w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />}
+              {planState === "done" && <Activity className="w-3 h-3" />}
+              {planState === "idle" ? "一键执行" : planState === "executing" ? "执行中…" : "已执行"}
+            </button>
+          </div>
         </div>
         <div className="rounded-md p-2.5" style={{ background: "rgba(255,159,67,0.06)", border: "1px solid rgba(255,159,67,0.22)" }}>
           <div className="flex items-center gap-1.5 mb-1">
@@ -583,7 +625,67 @@ function AISuggestion() {
           <div style={{ color: COLORS.text, fontSize: 11, lineHeight: 1.6 }}>
             系统检测到【<span style={{ color: COLORS.orange }}>螺纹钢-HRB400</span>】价格连续 3 月上涨，且 <span style={{ color: COLORS.orange }}>京沪改扩</span> 项目该类备品物资库存不足，建议触发采购智能体，自动发起采购申请。
           </div>
+          <div className="mt-2 flex justify-end">
+            <button
+              onClick={() => exec("purchase", "采购触发建议")}
+              disabled={purchaseState !== "idle"}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-medium transition-all"
+              style={{
+                background: purchaseState === "done"
+                  ? "rgba(39,214,165,0.18)"
+                  : purchaseState === "executing"
+                  ? "rgba(255,159,67,0.18)"
+                  : "rgba(255,159,67,0.14)",
+                border: `1px solid ${purchaseState === "done" ? COLORS.green : purchaseState === "executing" ? COLORS.orange : "rgba(255,159,67,0.45)"}`,
+                color: purchaseState === "done" ? COLORS.green : purchaseState === "executing" ? COLORS.orange : COLORS.orangeSoft,
+                cursor: purchaseState !== "idle" ? "default" : "pointer",
+                boxShadow: purchaseState !== "idle" ? `0 0 10px ${purchaseState === "done" ? COLORS.green : COLORS.orange}40` : "none",
+              }}
+            >
+              {purchaseState === "idle" && <Sparkles className="w-3 h-3" />}
+              {purchaseState === "executing" && <span className="w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />}
+              {purchaseState === "done" && <Activity className="w-3 h-3" />}
+              {purchaseState === "idle" ? "一键执行" : purchaseState === "executing" ? "执行中…" : "已执行"}
+            </button>
+          </div>
         </div>
+      </div>
+
+      {/* 批量执行按钮 */}
+      <div className="mt-3 flex justify-end">
+        <button
+          onClick={execAll}
+          disabled={allDone || (planState === "executing" || purchaseState === "executing")}
+          className="flex items-center gap-1.5 px-4 py-1.5 rounded-md text-[11px] font-semibold transition-all"
+          style={{
+            background: allDone
+              ? "rgba(39,214,165,0.14)"
+              : (planState === "executing" || purchaseState === "executing")
+              ? "rgba(63,169,245,0.08)"
+              : "rgba(63,169,245,0.16)",
+            border: `1px solid ${allDone ? COLORS.green : (planState === "executing" || purchaseState === "executing") ? "rgba(63,169,245,0.3)" : "rgba(63,169,245,0.55)"}`,
+            color: allDone ? COLORS.green : (planState === "executing" || purchaseState === "executing") ? "rgba(96,165,250,0.5)" : COLORS.cyanSoft,
+            cursor: allDone || (planState === "executing" || purchaseState === "executing") ? "default" : "pointer",
+            boxShadow: allDone ? `0 0 14px ${COLORS.green}50` : "none",
+          }}
+        >
+          {allDone ? (
+            <>
+              <Activity className="w-3.5 h-3.5" />
+              全部已执行
+            </>
+          ) : (planState === "executing" || purchaseState === "executing") ? (
+            <>
+              <span className="w-3.5 h-3.5 rounded-full border-2 border-current border-t-transparent animate-spin" />
+              执行中…
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-3.5 h-3.5" />
+              一键执行全部
+            </>
+          )}
+        </button>
       </div>
     </Panel>
   );
@@ -593,7 +695,7 @@ export function ControlTower() {
   const now = useMemo(() => new Date().toLocaleString("zh-CN", { hour12: false }), []);
   const [statusOpen, setStatusOpen] = useState(false);
   return (
-    <div className="relative w-full" style={{ background: COLORS.bg, color: COLORS.text, minHeight: "100%", aspectRatio: "16 / 9" }}>
+    <div className="relative w-full h-full" style={{ background: COLORS.bg, color: COLORS.text, minHeight: "100dvh" }}>
       <div className="absolute inset-0 pointer-events-none" style={{
         backgroundImage: "radial-gradient(ellipse at center, rgba(63,169,245,0.08) 0%, transparent 60%), linear-gradient(180deg, #061325 0%, #04101e 100%)",
       }} />

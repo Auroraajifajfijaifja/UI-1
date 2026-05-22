@@ -1,3 +1,4 @@
+import React from "react";
 import { ClipboardList, FileSearch, PieChart, FileSignature, Wallet } from "lucide-react";
 
 export type ModuleKey = "plan" | "project" | "rate" | "contract" | "settle";

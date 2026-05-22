@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Sparkles, FileBarChart, Settings2, Check, TrendingUp } from "lucide-react";
 import { MODULES, ModuleKey } from "./ProcurementTabs";
 

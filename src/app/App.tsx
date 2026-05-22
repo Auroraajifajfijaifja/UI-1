@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Bell, Search, Menu, Gauge, ShoppingCart, FileText, Users, BarChart3, Settings, Maximize2, Minimize2, ChevronsLeft, ChevronsRight, ChevronDown, Building2, UserCircle2 } from "lucide-react";
 import { TopTabs, ModuleKey } from "./components/ProcurementTabs";
 import { PlanModule } from "./components/modules/PlanModule";
@@ -199,7 +199,7 @@ export default function App() {
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>
-            <div className="w-full" style={{ aspectRatio: "16 / 9", minHeight: isFullscreen ? "100vh" : "calc(100vh - 64px)" }}>
+            <div className="w-full h-full">
               <ControlTower />
             </div>
           </div>
