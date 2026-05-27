@@ -90,7 +90,7 @@ function PurchaseStatsCard() {
   };
 
   return (
-    <Panel title="采购与需求总览">
+    <Panel title="采购交易">
       <div className="grid grid-cols-2 gap-2.5">
         {purchaseStats.map((s) => (
           <div
@@ -218,7 +218,7 @@ function DemandForecastCard() {
     }],
   };
   return (
-    <Panel title="各单位需求预测">
+    <Panel title="采购需求预测">
       <ReactECharts option={option} style={{ height: 188 }} />
     </Panel>
   );
@@ -316,7 +316,7 @@ function SupplierCard() {
     ],
   };
   return (
-    <Panel title="供应商管理">
+    <Panel title="供应商类型">
       <ReactECharts option={option} style={{ height: 152 }} />
       <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-1">
         {supplierCategories.map((s) => (
@@ -343,10 +343,10 @@ function SupplierCard() {
 
 // ─── 顶部核心指标栏 ─────────────────────────────────────────────────────────
 const topMetrics = [
-  { icon: Building2, value: "17,000+", label: "项目部总数", accent: T.cyan },
-  { icon: Users, value: "300,000+", label: "合作供应商", accent: T.orange },
-  { icon: Wrench, value: "202,294", label: "全域设备资产", accent: T.green },
-  { icon: GraduationCap, value: "57,187", label: "储备评标专家", accent: "#8b5cf6" },
+  { icon: Building2, value: "17,000+", label: "项目数量", accent: T.cyan },
+  { icon: Users, value: "300,000+", label: "入驻供应商", accent: T.orange },
+  { icon: Wrench, value: "202,294", label: "设备数量", accent: T.green },
+  { icon: GraduationCap, value: "57,187", label: "评标专家", accent: "#8b5cf6" },
 ];
 
 function TopMetricsBar() {
@@ -988,7 +988,7 @@ function PriceMonitor() {
   };
 
   return (
-    <Panel title="价格监控中心" extra={
+    <Panel title="价格中心" extra={
       <div className="flex items-center gap-1.5">
         <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: T.green }} />
         <span style={{ color: T.textDim, fontSize: 10 }}>实时行情</span>
