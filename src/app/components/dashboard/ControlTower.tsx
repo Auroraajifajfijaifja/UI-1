@@ -71,6 +71,191 @@ function Panel({
   );
 }
 
+// ─── 价格中心筛选栏 ──────────────────────────────────────────────────────────
+interface PriceFilterState {
+  material: string;
+  package: string;
+  spec: string;
+  timeRange: string;
+  province: string;
+  city: string;
+}
+
+const cityData: Record<string, string[]> = {
+  "河北": ["石家庄", "唐山", "邯郸", "保定", "张家口", "廊坊"],
+  "山东": ["济南", "青岛", "烟台", "潍坊", "临沂", "淄博"],
+  "江苏": ["南京", "苏州", "无锡", "常州", "南通", "徐州"],
+  "广东": ["广州", "深圳", "东莞", "佛山", "珠海", "中山"],
+  "四川": ["成都", "绵阳", "德阳", "宜宾", "南充", "泸州"],
+  "浙江": ["杭州", "宁波", "温州", "嘉兴", "湖州", "绍兴"],
+  "河南": ["郑州", "洛阳", "开封", "新乡", "南阳", "许昌"],
+  "湖北": ["武汉", "宜昌", "襄阳", "荆州", "黄石", "十堰"],
+  "湖南": ["长沙", "株洲", "湘潭", "衡阳", "岳阳", "常德"],
+  "安徽": ["合肥", "芜湖", "蚌埠", "淮南", "马鞍山", "淮北"],
+  "福建": ["福州", "厦门", "泉州", "漳州", "莆田", "宁德"],
+  "江西": ["南昌", "赣州", "九江", "宜春", "上饶", "抚州"],
+};
+
+function PriceFilterBar({
+  filters,
+  onChange,
+}: {
+  filters: PriceFilterState;
+  onChange: (f: PriceFilterState) => void;
+}) {
+  const dropdownData = {
+    material: ["钢筋", "水泥", "混凝土", "木材", "砂石"],
+    package: ["包件 A", "包件 B", "包件 C", "包件 D"],
+    spec: ["HRB400E", "HRB500E", "PO 42.5", "PC 32.5", "C30", "C40"],
+  };
+  const timeOptions = ["年", "月", "周", "日"];
+  const provinces = Object.keys(cityData);
+
+  const handleChange = (key: keyof PriceFilterState, value: string) => {
+    if (key === "province") {
+      onChange({ ...filters, province: value, city: "" });
+    } else {
+      onChange({ ...filters, [key]: value });
+    }
+  };
+
+  const dropdownStyle: React.CSSProperties = {
+    appearance: "none",
+    WebkitAppearance: "none",
+    background: "rgba(8,18,46,0.90)",
+    border: `1px solid ${T.border}`,
+    borderRadius: "8px",
+    color: T.text,
+    fontSize: 11,
+    padding: "5px 28px 5px 10px",
+    cursor: "pointer",
+    outline: "none",
+    minWidth: 70,
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237c93b3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 8px center",
+    transition: "border-color 0.2s",
+  };
+
+  const selectWrap: React.CSSProperties = {
+    position: "relative",
+    flexShrink: 0,
+  };
+
+  return (
+    <div
+      style={{
+        background: "rgba(8,18,46,0.55)",
+        border: `1px solid rgba(41,182,246,0.10)`,
+        borderRadius: "10px",
+        padding: "10px 14px",
+        marginBottom: 10,
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        flexWrap: "wrap",
+      }}
+    >
+      {(["material", "package", "spec"] as const).map((key) => (
+        <div key={key} style={selectWrap}>
+          <select
+            value={filters[key]}
+            onChange={(e) => handleChange(key, e.target.value)}
+            style={{
+              ...dropdownStyle,
+              minWidth: key === "spec" ? 80 : 70,
+            }}
+          >
+            <option value="">全部</option>
+            {dropdownData[key].map((opt) => (
+              <option key={opt} value={opt} style={{ background: "#08122E" }}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+      ))}
+
+      <div style={{ width: 1, height: 16, background: `${T.border}`, flexShrink: 0 }} />
+
+      {/* 时间 segment */}
+      <div
+        style={{
+          display: "flex",
+          background: "rgba(8,18,46,0.90)",
+          border: `1px solid ${T.border}`,
+          borderRadius: "8px",
+          overflow: "hidden",
+          flexShrink: 0,
+        }}
+      >
+        {timeOptions.map((opt, i) => {
+          const isActive = filters.timeRange === opt;
+          return (
+            <button
+              key={opt}
+              onClick={() => handleChange("timeRange", opt)}
+              style={{
+                background: isActive ? "rgba(41,182,246,0.22)" : "transparent",
+                border: "none",
+                borderRight: i < timeOptions.length - 1 ? `1px solid ${T.border}` : "none",
+                color: isActive ? T.cyanSoft : T.textDim,
+                fontSize: 11,
+                padding: "5px 10px",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                fontWeight: isActive ? 600 : 400,
+              }}
+            >
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ width: 1, height: 16, background: `${T.border}`, flexShrink: 0 }} />
+
+      {/* 省 */}
+      <div style={selectWrap}>
+        <select
+          value={filters.province}
+          onChange={(e) => handleChange("province", e.target.value)}
+          style={{ ...dropdownStyle, minWidth: 70 }}
+        >
+          <option value="">全部省份</option>
+          {provinces.map((p) => (
+            <option key={p} value={p} style={{ background: "#08122E" }}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* 市 */}
+      <div style={selectWrap}>
+        <select
+          value={filters.city}
+          onChange={(e) => handleChange("city", e.target.value)}
+          disabled={!filters.province}
+          style={{
+            ...dropdownStyle,
+            minWidth: 70,
+            opacity: filters.province ? 1 : 0.4,
+            cursor: filters.province ? "pointer" : "not-allowed",
+          }}
+        >
+          <option value="">全部城市</option>
+          {(cityData[filters.province] || []).map((c) => (
+            <option key={c} value={c} style={{ background: "#08122E" }}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+}
+
 // ─── 左侧模块 1: 采购与需求总览 ─────────────────────────────────────────────
 const purchaseStats = [
   { label: "采购计划金额", value: "218.6", unit: "亿元", growth: "+8.6%", up: true },
@@ -343,8 +528,8 @@ function SupplierCard() {
 
 // ─── 顶部核心指标栏 ─────────────────────────────────────────────────────────
 const topMetrics = [
-  { icon: Building2, value: "17,000+", label: "项目数量", accent: T.cyan },
-  { icon: Users, value: "300,000+", label: "入驻供应商", accent: T.orange },
+  { icon: Building2, value: "17,000", label: "项目数量", accent: T.cyan },
+  { icon: Users, value: "286,420", label: "入驻供应商", accent: T.orange },
   { icon: Wrench, value: "202,294", label: "设备数量", accent: T.green },
   { icon: GraduationCap, value: "57,187", label: "评标专家", accent: "#8b5cf6" },
 ];
@@ -709,9 +894,7 @@ const logisticsNodes = [
 ];
 
 const logisticsRoutes = [
-  { from: [121.47, 31.23], to: [116.99, 36.65], cargo: "HRB400E 螺纹钢", vehicle: "豫 A**** 重卡", status: "延误3天", delay: true },
-  { from: [113.35, 22.80], to: [104.06, 30.67], cargo: "高强度钢板", vehicle: "粤 B**** 厢式货车", status: "正常", delay: false },
-  { from: [121.47, 31.23], to: [116.07, 38.97], cargo: "水泥 500 吨", vehicle: "沪 D**** 罐车", status: "正常", delay: false },
+  { from: [121.47, 31.23], to: [116.99, 36.65], vehicle: "豫 A**** 货运重卡", location: "河南省郑州市高速路段", cargo: "国标 HRB400E 螺纹钢", scheduledDate: "2023-11-18", delayReason: "受南方梅雨强降雨天气影响", weather: "暴雨", temperature: "18°C", humidity: "89%", delayDays: 3, delay: true, inventoryWarning: "偏低" },
 ];
 
 function LogisticsMap() {
@@ -738,8 +921,8 @@ function LogisticsMap() {
       coords: [r.from, r.to],
       lineStyle: {
         color: r.delay ? T.red : T.orange,
-        width: activeRoute === null || activeRoute === i ? 2.5 : 1,
-        opacity: activeRoute === null || activeRoute === i ? 1 : 0.4,
+        width: 2,
+        opacity: activeRoute === null || activeRoute === i ? 1 : 0.35,
       },
       name: String(i),
     }));
@@ -760,14 +943,15 @@ function LogisticsMap() {
           if (p.seriesType === "lines") {
             const idx = parseInt(p.name);
             const r = logisticsRoutes[idx];
-            return `<div style="min-width:200px"><div style="color:${T.orangeSoft};font-weight:600;margin-bottom:6px">${r.cargo}</div><div style="color:${T.textDim};font-size:11px;margin-bottom:3px">承运车辆：<span style="color:${T.text}">${r.vehicle}</span></div><div style="color:${T.textDim};font-size:11px">状态：<span style="color:${r.delay ? T.red : T.green};font-weight:600">${r.status}</span></div></div>`;
+            return `<div style="min-width:200px"><div style="color:${T.orangeSoft};font-weight:600;margin-bottom:6px">${r.cargo}</div><div style="color:${T.textDim};font-size:11px;margin-bottom:3px">承运车辆：<span style="color:${T.text}">${r.vehicle}</span></div><div style="color:${T.textDim};font-size:11px">状态：<span style="color:${r.delay ? T.red : T.green};font-weight:600">${r.delay ? "延误 " + r.delayDays + " 天" : "正常"}</span></div></div>`;
           }
           return `<div style="color:${T.cyanSoft}">${p.name}</div>`;
         },
       },
       geo: {
         map: "china",
-        roam: false,
+        roam: true,
+        scaleLimit: { min: 0.8, max: 4 },
         zoom: 1.15,
         center: [108, 34],
         itemStyle: {
@@ -785,9 +969,24 @@ function LogisticsMap() {
           coordinateSystem: "geo",
           zlevel: 2,
           effect: {
-            show: true, period: 5, trailLength: 0.35,
-            symbol: "arrow", symbolSize: 5, color: T.cyanSoft,
+            show: true, period: 4, trailLength: 0.2,
+            symbol: "path://M-12,-7 L10,-7 L10,-4 L3,-4 L3,0 L10,0 L10,3 L-12,3 Z M-12,3 L-12,7 L-5,7 L-5,3 Z",
+            symbolSize: 12, color: T.orangeSoft,
           },
+          lineStyle: { width: 2.5, opacity: 1 },
+          data: routeLines,
+        },
+        {
+          name: "货车轨迹",
+          type: "lines",
+          coordinateSystem: "geo",
+          zlevel: 3,
+          effect: {
+            show: true, period: 4, trailLength: 0.6,
+            symbol: "path://M-12,-7 L10,-7 L10,-4 L3,-4 L3,0 L10,0 L10,3 L-12,3 Z M-12,3 L-12,7 L-5,7 L-5,3 Z",
+            symbolSize: 14, color: T.orange,
+          },
+          lineStyle: { width: 0, opacity: 0 },
           data: routeLines,
         },
         {
@@ -842,9 +1041,9 @@ function LogisticsMap() {
       )}
       {/* 物流信息浮窗 */}
       <div
-        className="absolute top-3 left-3 z-10 rounded-xl px-3.5 py-2.5 max-w-[220px]"
+        className="absolute top-3 left-3 z-10 rounded-xl px-3.5 py-2.5 max-w-[280px]"
         style={{
-          background: "rgba(8,18,46,0.90)",
+          background: "rgba(8,18,46,0.92)",
           border: `1px solid ${T.border}`,
           backdropFilter: "blur(12px)",
           boxShadow: `0 4px 20px rgba(0,0,0,0.5)`,
@@ -858,19 +1057,55 @@ function LogisticsMap() {
           {logisticsRoutes.map((r, i) => (
             <div
               key={i}
-              className="flex items-start gap-2 text-[10px] cursor-pointer transition-all rounded p-1.5"
+              className="cursor-pointer transition-all rounded-lg p-2"
               style={{
-                background: activeRoute === i ? "rgba(255,125,0,0.12)" : "transparent",
-                border: `1px solid ${activeRoute === i ? "rgba(255,125,0,0.35)" : "transparent"}`,
+                background: activeRoute === i ? "rgba(255,125,0,0.08)" : "rgba(255,255,255,0.02)",
+                border: `1px solid ${activeRoute === i ? "rgba(255,125,0,0.3)" : "transparent"}`,
               }}
               onClick={() => setActiveRoute((prev) => (prev === i ? null : i))}
             >
-              <Truck className="w-3 h-3 flex-shrink-0 mt-0.5" style={{ color: r.delay ? T.red : T.orange }} />
-              <div className="min-w-0">
-                <div style={{ color: T.text }} className="truncate">{r.vehicle}</div>
-                <div style={{ color: T.textDim }} className="truncate">{r.cargo}</div>
-                <div className="mt-0.5" style={{ color: r.delay ? T.red : T.green, fontWeight: 600 }}>
-                  {r.status}
+              <div className="flex items-center gap-1.5 mb-2 pb-2 border-b" style={{ borderColor: `${T.border}60` }}>
+                <Truck className="w-3.5 h-3.5 flex-shrink-0" style={{ color: r.delay ? T.red : T.orange }} />
+                <span style={{ color: T.text, fontSize: 10, fontWeight: 600 }}>{r.vehicle}</span>
+                <span className="ml-auto" style={{ color: T.textDim, fontSize: 9 }}>{r.location}</span>
+              </div>
+
+              <div className="space-y-1 px-1 mb-2">
+                <div className="flex items-center justify-between">
+                  <span style={{ color: T.textMuted, fontSize: 9 }}>在运物料:</span>
+                  <span style={{ color: T.text, fontSize: 9 }}>{r.cargo}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span style={{ color: T.textMuted, fontSize: 9 }}>原定到货:</span>
+                  <span style={{ color: T.text, fontSize: 9 }}>{r.scheduledDate}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span style={{ color: T.textMuted, fontSize: 9 }}>现场库存:</span>
+                  <span style={{ color: T.red, fontSize: 9, fontWeight: 600 }}>{r.inventoryWarning}</span>
+                </div>
+              </div>
+
+              <div
+                className="rounded-md p-2"
+                style={{ background: "rgba(255,80,80,0.08)", border: `1px solid rgba(255,80,80,0.2)` }}
+              >
+                <div className="flex items-center gap-1 mb-1.5">
+                  <Cloud className="w-3 h-3" style={{ color: T.cyan }} />
+                  <span style={{ color: T.textMuted, fontSize: 9 }}>{r.delayReason}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <span style={{ color: T.red, fontSize: 16, fontWeight: 700, lineHeight: 1 }}>{r.weather}</span>
+                    <div className="flex flex-col">
+                      <span style={{ color: T.textMuted, fontSize: 8 }}>{r.temperature}</span>
+                      <span style={{ color: T.textMuted, fontSize: 8 }}>湿度 {r.humidity}</span>
+                    </div>
+                  </div>
+                  <div className="flex-1 border-t" style={{ borderColor: "rgba(255,80,80,0.2)" }} />
+                  <div className="text-right">
+                    <div style={{ color: T.red, fontSize: 11, fontWeight: 700 }}>+{r.delayDays} 天</div>
+                    <div style={{ color: T.textMuted, fontSize: 8 }}>延迟到货</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -947,6 +1182,14 @@ function QuickEntries() {
 
 // ─── 右侧模块 1: 价格监控中心 ───────────────────────────────────────────────
 function PriceMonitor() {
+  const [filters, setFilters] = useState<PriceFilterState>({
+    material: "钢筋",
+    package: "",
+    spec: "HRB400E",
+    timeRange: "月",
+    province: "",
+    city: "",
+  });
   const option = {
     grid: { left: 0, right: 52, top: 8, bottom: 0, containLabel: true },
     tooltip: { trigger: "axis", backgroundColor: "rgba(8,18,46,0.95)", borderColor: T.borderStrong, textStyle: { color: T.text } },
@@ -994,6 +1237,7 @@ function PriceMonitor() {
         <span style={{ color: T.textDim, fontSize: 10 }}>实时行情</span>
       </div>
     }>
+      <PriceFilterBar filters={filters} onChange={setFilters} />
       <div className="grid grid-cols-3 gap-2 mb-3">
         {[
           { label: "战采协议价", value: "3,860", unit: "元/吨", color: T.green },
