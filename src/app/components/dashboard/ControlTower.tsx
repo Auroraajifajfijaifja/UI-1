@@ -1589,7 +1589,7 @@ export function ControlTower() {
         <div className="flex-1 grid grid-cols-12 gap-3 min-h-0">
 
           {/* 左列 */}
-          <div className="col-span-3 flex flex-col gap-3 overflow-auto">
+          <div className="col-span-3 flex flex-col gap-3 overflow-auto hide-scrollbar">
             <PurchaseStatsCard />
             <DemandForecastCard />
             <RatesCard />
@@ -1649,7 +1649,7 @@ export function ControlTower() {
           </div>
 
           {/* 右列 */}
-          <div className="col-span-3 flex flex-col gap-3 overflow-auto">
+          <div className="col-span-3 flex flex-col gap-3 overflow-auto hide-scrollbar">
             <PriceMonitor />
             <RiskCenter />
             <AISuggestion />
@@ -1666,6 +1666,13 @@ export function ControlTower() {
         @keyframes glow {
           0%, 100% { box-shadow: 0 0 8px currentColor; }
           50% { box-shadow: 0 0 16px currentColor; }
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
     </div>
