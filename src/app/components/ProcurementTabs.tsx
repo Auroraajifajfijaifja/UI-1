@@ -6,7 +6,7 @@ export type ModuleKey = "plan" | "project" | "rate" | "contract" | "settle";
 export const MODULES: { key: ModuleKey; title: string; subtitle: string; value: string; trend: string; icon: any; accent: string }[] = [
   { key: "plan", title: "采购计划", subtitle: "本年累计计划", value: "2,560", trend: "+12.4%", icon: ClipboardList, accent: "from-blue-50 to-blue-100 text-blue-600" },
   { key: "project", title: "采购立项", subtitle: "本年立项总数", value: "1,284", trend: "+8.2%", icon: FileSearch, accent: "from-sky-50 to-sky-100 text-sky-600" },
-  { key: "rate", title: "采购四率", subtitle: "综合执行评分", value: "92.6%", trend: "+2.1%", icon: PieChart, accent: "from-indigo-50 to-indigo-100 text-indigo-500" },
+  { key: "rate", title: "采购五率", subtitle: "综合执行评分", value: "92.6%", trend: "+2.1%", icon: PieChart, accent: "from-indigo-50 to-indigo-100 text-indigo-500" },
   { key: "contract", title: "合同", subtitle: "履约中合同数", value: "865", trend: "+5.6%", icon: FileSignature, accent: "from-sky-50 to-sky-100 text-sky-600" },
   { key: "settle", title: "结算", subtitle: "本年结算金额", value: "¥87,256", trend: "+9.8%", icon: Wallet, accent: "from-emerald-50 to-emerald-100 text-emerald-600" },
 ];
